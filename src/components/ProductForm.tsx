@@ -10,16 +10,30 @@ interface ProductFormProps {
 }
 
 const ProductForm: React.FC<ProductFormProps> = ({ product, onClose }) => {
+
   const { addProduct, updateProduct } = useData();
+
   const [formData, setFormData] = useState({
     name: '',
     category: '',
     price: '',
-    stock: '',
     supplier: '',
     barcode: '',
     description: '',
-    status: 'active' as 'active' | 'inactive'
+    sku: '',
+    brand: '',
+    unit_price: '',
+    cost_price : '',
+    stock_quantity: '',
+    supplier_id: '',
+    min_stock_level: '',
+    max_stock_level: '',
+    tax_rate : '',
+    weight : '',
+    dimensions: '',
+    image_urls: [] as string[],
+    tags: [] as string[],
+    is_active: 'active' as 'active' | 'inactive'
   });
 
   useEffect(() => {
@@ -27,28 +41,52 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose }) => {
       setFormData({
         name: product.name,
         category: product.category,
-        price: product.price.toString(),
-        stock: product.stock.toString(),
+        price: product.unit_price.toString(), // usar unit_price como fuente
         supplier: product.supplier,
+        supplier_id: product.supplier_id || '',
         barcode: product.barcode,
         description: product.description,
-        status: product.status
+        sku: product.sku,
+        brand: product.brand,
+        unit_price: product.unit_price,
+        cost_price: product.cost_price,
+        stock_quantity: product.stock_quantity,
+        min_stock_level: product.min_stock_level,
+        max_stock_level: product.max_stock_level,
+        tax_rate: product.tax_rate,
+        weight: product.weight,
+        dimensions: product.dimensions,
+        image_urls: product.image_urls || [],
+        tags: product.tags || [],
+        is_active: product.is_active
       });
     }
   }, [product]);
 
   const handleSubmit = (e: React.FormEvent) => {
+    
     e.preventDefault();
     
     const productData = {
       name: formData.name,
       category: formData.category,
-      price: parseFloat(formData.price),
-      stock: parseInt(formData.stock),
+      sku: formData.sku,
+      brand: formData.brand,
+      unit_price: parseFloat(formData.unit_price),
+      cost_price: parseFloat(formData.cost_price),
+      stock_quantity: parseInt(formData.stock_quantity),
+      supplier_id: formData.supplier_id,
       supplier: formData.supplier,
       barcode: formData.barcode,
       description: formData.description,
-      status: formData.status
+      min_stock_level: parseInt(formData.min_stock_level),
+      max_stock_level: parseInt(formData.max_stock_level),
+      tax_rate: parseFloat(formData.tax_rate),
+      weight: parseFloat(formData.weight),
+      is_active: formData.is_active,
+      dimensions: formData.dimensions,
+      image_urls: formData.image_urls,
+      tags: formData.tags
     };
 
     if (product) {
@@ -127,7 +165,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose }) => {
                 id="stock"
                 type="number"
                 label="Stock Quantity"
-                value={formData.stock}
+                value={formData.stock_quantity}
                 onChange={handleChange}
                 required
                 icon={<Hash className="w-5 h-5" />}
@@ -181,19 +219,19 @@ const ProductForm: React.FC<ProductFormProps> = ({ product, onClose }) => {
                 </div>
                 <button
                   type="button"
-                  onClick={() => setFormData({ ...formData, status: formData.status === 'active' ? 'inactive' : 'active' })}
+                  onClick={() => setFormData({ ...formData, is_active: formData.is_active === 'active' ? 'inactive' : 'active' })}
                   className={`relative inline-flex items-center px-4 py-2 rounded-lg font-medium transition-colors ${
-                    formData.status === 'active'
+                    formData.is_active === 'active'
                       ? 'bg-green-100 text-green-800 hover:bg-green-200'
                       : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
                   }`}
                 >
-                  {formData.status === 'active' ? (
+                  {formData.is_active === 'active' ? (
                     <ToggleRight className="w-5 h-5 mr-2" />
                   ) : (
                     <ToggleLeft className="w-5 h-5 mr-2" />
                   )}
-                  {formData.status === 'active' ? 'Active' : 'Inactive'}
+                  {formData.is_active === 'active' ? 'Active' : 'Inactive'}
                 </button>
               </div>
             </div>

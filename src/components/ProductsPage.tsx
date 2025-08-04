@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Search, Package, Save, Plus, Edit, AlertCircle, MoreHorizontal, Download, Archive, Sparkles, ArrowLeft } from 'lucide-react';
+import { Search, Package, Plus, Edit, AlertCircle, MoreHorizontal, Download, Archive, Sparkles, ArrowLeft } from 'lucide-react';
 import { useData } from '../contexts/DataContext';
 import { useNotifications } from '../contexts/NotificationContext';
 import ConfirmModal from './ConfirmModal';
@@ -11,7 +11,7 @@ import AISwitch from './AISwitch';
 import FloatingLabelInput from './FloatingLabelInput';
 
 const ProductsPage: React.FC = () => {
-  const { products, addProduct, updateProduct, searchProducts, loading } = useData();
+  const { addProduct, updateProduct, searchProducts, loading } = useData();
   const { showSuccess, showError } = useNotifications();
   const [searchTerm, setSearchTerm] = useState('');
   const [searchResults, setSearchResults] = useState<any[]>([]);
@@ -27,11 +27,23 @@ const ProductsPage: React.FC = () => {
     name: '',
     category: '',
     price: '',
-    stock: '',
+    stock_quantity: '',
     supplier: '',
     barcode: '',
     description: '',
-    status: 'active' as 'active' | 'inactive'
+    sku: '',
+    brand: '',
+    unit_price: '',
+    cost_price: '',
+    supplier_id: '',
+    min_stock_level: '',
+    max_stock_level: '',
+    tax_rate: '',
+    weight: '',
+    is_active: 'active' as 'active' | 'inactive',
+    dimensions: '',
+    image_urls: [] as string[],
+    tags: [] as string[]
   });
 
   const [originalFormData, setOriginalFormData] = useState(formData);
@@ -62,12 +74,24 @@ const ProductsPage: React.FC = () => {
     const productFormData = {
       name: product.name,
       category: product.category,
-      price: product.price.toString(),
-      stock: product.stock.toString(),
+      price: product.unit_price.toString(),
+      stock_quantity: product.stock_quantity,
       supplier: product.supplier,
+      supplier_id: product.supplier_id || '',
       barcode: product.barcode,
       description: product.description,
-      status: product.status
+      is_active: product.is_active,
+      sku: product.sku || '',
+      brand: product.brand || '',
+      unit_price: product.unit_price.toString(),
+      cost_price: product.cost_price.toString(),
+      min_stock_level: product.min_stock_level.toString(),
+      max_stock_level: product.max_stock_level.toString(),
+      tax_rate: product.tax_rate.toString(),
+      weight: product.weight.toString(),
+      dimensions: product.dimensions || '',
+      image_urls: product.image_urls || [],
+      tags: product.tags || []
     };
     setFormData(productFormData);
     setOriginalFormData(productFormData);
@@ -81,11 +105,23 @@ const ProductsPage: React.FC = () => {
       name: '',
       category: '',
       price: '',
-      stock: '',
       supplier: '',
+      supplier_id: '',
       barcode: '',
       description: '',
-      status: 'active' as 'active' | 'inactive'
+      is_active: 'active' as 'active' | 'inactive',
+      sku: '',
+      brand: '',
+      unit_price: '',
+      cost_price: '',
+      stock_quantity: '',
+      min_stock_level: '',
+      max_stock_level: '',
+      tax_rate: '',
+      weight: '',
+      dimensions: '',
+      image_urls: [] as string[],
+      tags: [] as string[]
     };
     setFormData(emptyForm);
     setOriginalFormData(emptyForm);
@@ -118,7 +154,7 @@ const ProductsPage: React.FC = () => {
       showError('Error de validación', 'El precio debe ser mayor a 0');
       return;
     }
-    if (!formData.stock || parseInt(formData.stock) < 0) {
+    if (!formData.stock_quantity || parseInt(formData.stock_quantity) < 0) {
       showError('Error de validación', 'El stock no puede ser negativo');
       return;
     }
@@ -126,12 +162,23 @@ const ProductsPage: React.FC = () => {
     const productData = {
       name: formData.name,
       category: formData.category,
-      price: parseFloat(formData.price),
-      stock: parseInt(formData.stock),
+      sku: formData.sku,
+      brand: formData.brand,
+      unit_price: parseFloat(formData.unit_price),           // conversión aquí
+      cost_price: parseFloat(formData.cost_price),           // conversión aquí
+      stock_quantity: parseInt(formData.stock_quantity),     // conversión aquí
+      supplier_id: formData.supplier_id,
       supplier: formData.supplier,
       barcode: formData.barcode,
       description: formData.description,
-      status: formData.status
+      min_stock_level: parseInt(formData.min_stock_level),   // conversión aquí
+      max_stock_level: parseInt(formData.max_stock_level),   // conversión aquí
+      tax_rate: parseFloat(formData.tax_rate),               // conversión aquí
+      weight: parseFloat(formData.weight),                   // conversión aquí
+      is_active: formData.is_active,
+      dimensions: formData.dimensions,
+      image_urls: formData.image_urls,
+      tags: formData.tags
     };
 
     try {
@@ -168,12 +215,24 @@ const ProductsPage: React.FC = () => {
       const productFormData = {
         name: selectedProduct.name,
         category: selectedProduct.category,
-        price: selectedProduct.price.toString(),
-        stock: selectedProduct.stock.toString(),
+        price: selectedProduct.unit_price.toString(),         // price como string para input
         supplier: selectedProduct.supplier,
+        supplier_id: selectedProduct.supplier_id || '',
         barcode: selectedProduct.barcode,
         description: selectedProduct.description,
-        status: selectedProduct.status
+        is_active: selectedProduct.is_active,                     // status adaptado a is_active
+        sku: selectedProduct.sku || '',
+        brand: selectedProduct.brand || '',
+        unit_price: selectedProduct.unit_price,
+        cost_price: selectedProduct.cost_price,
+        stock_quantity: selectedProduct.stock_quantity,
+        min_stock_level: selectedProduct.min_stock_level,
+        max_stock_level: selectedProduct.max_stock_level,
+        tax_rate: selectedProduct.tax_rate,
+        weight: selectedProduct.weight,
+        dimensions: selectedProduct.dimensions || '',
+        image_urls: selectedProduct.image_urls || [],
+        tags: selectedProduct.tags || []
       };
       setFormData(productFormData);
       setOriginalFormData(productFormData);
@@ -187,7 +246,7 @@ const ProductsPage: React.FC = () => {
   const handleArchive = async () => {
     if (selectedProduct) {
       try {
-        await updateProduct(selectedProduct.id, { status: 'inactive', archivedAt: new Date() });
+        await updateProduct(selectedProduct.id, { is_active: 'inactive', updatedAt: new Date() });
         showSuccess('Producto archivado', `${selectedProduct.name} se archivó correctamente`);
         setShowConfirmModal(false);
         clearForm();
@@ -207,7 +266,7 @@ const ProductsPage: React.FC = () => {
   const handleStatusChange = (checked: boolean) => {
     setFormData({
       ...formData,
-      status: checked ? 'active' : 'inactive'
+      is_active: checked ? 'active' : 'inactive'
     });
   };
 
@@ -314,7 +373,7 @@ const ProductsPage: React.FC = () => {
               >
                 <div className="font-medium text-gray-900 dark:text-white text-sm">{product.name}</div>
                 <div className="text-sm text-gray-600 dark:text-gray-400">{product.category} - ${product.price}</div>
-                <div className="text-xs text-gray-500 dark:text-gray-500">Stock: {product.stock}</div>
+                <div className="text-xs text-gray-500 dark:text-gray-500">Stock: {product.stock_quantity}</div>
               </button>
             ))}
           </div>
@@ -409,13 +468,13 @@ const ProductsPage: React.FC = () => {
                 id="stock"
                 type="number"
                 label="Stock"
-                value={formData.stock}
+                value={formData.stock_quantity}
                 onChange={handleChange}
                 disabled={!isFormMode || selectedProduct?.status === 'inactive'}
                 placeholder="Cantidad en stock"
                 required
               />
-              {selectedProduct && parseInt(formData.stock) < 10 && (
+              {selectedProduct && parseInt(formData.stock_quantity) < 10 && (
                 <div className="flex items-center mt-2 text-red-600 dark:text-red-400">
                   <AlertCircle className="w-4 h-4 mr-1" />
                   <span className="text-sm">Stock bajo</span>
@@ -463,14 +522,14 @@ const ProductsPage: React.FC = () => {
               <div className="space-y-4">
                 <div>
                   <AISwitch
-                    checked={formData.status === 'active'}
+                    checked={formData.is_active === 'active'}
                     onChange={handleStatusChange}
                     label="Estado del Producto"
                     disabled={!isFormMode || selectedProduct?.status === 'inactive'}
                     size="md"
                   />
                   <p className="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                    {formData.status === 'active' ? 'Producto activo y disponible' : 'Producto inactivo'}
+                    {formData.is_active === 'active' ? 'Producto activo y disponible' : 'Producto inactivo'}
                   </p>
                 </div>
               </div>

@@ -4,16 +4,28 @@ import { productsAPI, customersAPI, suppliersAPI, salesAPI } from '../services/a
 interface Product {
   id: string;
   name: string;
+  sku: string;
   category: string;
-  price: number;
-  stock: number;
+  brand: string;
+  unit_price: number;
+  cost_price : number;
+  stock_quantity: number;
+  supplier_id: string;
   supplier: string;
   barcode: string;
   description: string;
-  status: 'active' | 'inactive';
+  min_stock_level: number;
+  max_stock_level: number;
+  tax_rate : number;
+  weight : number;
+  is_active: 'active' | 'inactive';
+  dimensions: string;
+  image_urls: string[]; // ✅
+  tags: string[];  
   createdAt: Date;
   updatedAt: Date;
 }
+
 
 interface Customer {
   id: string;
@@ -142,21 +154,33 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
       setError('Error al cargar los datos. Usando datos locales.');
       
       // Fallback to local data
-      setProducts([
-        {
-          id: '1',
-          name: 'Laptop HP Pavilion',
-          category: 'Electronics',
-          price: 899.99,
-          stock: 15,
-          supplier: 'TechSupply Inc.',
-          barcode: '1234567890123',
-          description: 'High-performance laptop for business and gaming',
-          status: 'active',
-          createdAt: new Date('2024-01-15'),
-          updatedAt: new Date('2024-01-15')
-        }
-      ]);
+    setProducts([
+    {
+      id: '1',
+      name: 'Laptop HP Pavilion',
+      sku: 'HP-PAV-001',
+      category: 'Electronics',
+      brand: 'HP',
+      unit_price: 899.99,
+      cost_price: 750.00,
+      stock_quantity: 20,
+      supplier_id: 'sup-001',
+      supplier: 'TechSupply Inc.',
+      barcode: '1234567890123',
+      description: 'High-performance laptop for business and gaming',
+      min_stock_level: 15,
+      max_stock_level: 50,
+      tax_rate: 0.16,
+      weight: 2.5,
+      is_active: 'active',
+      dimensions: '35x25x2.5 cm',
+      image_urls: [],
+      tags: [],
+      createdAt: new Date('2024-01-15'),
+      updatedAt: new Date('2024-01-15')
+    }
+  ]);
+
       
       setCustomers([
         {
@@ -221,7 +245,7 @@ export const DataProvider: React.FC<DataProviderProps> = ({ children }) => {
 
   const deleteProduct = async (id: string) => {
     try {
-      await productsAPI.delete(id);
+      await productsAPI.deactivate(id);
       setProducts(prev => prev.filter(p => p.id !== id));
     } catch (err) {
       console.error('Error deleting product:', err);

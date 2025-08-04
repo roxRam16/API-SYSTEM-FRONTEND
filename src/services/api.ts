@@ -1,6 +1,6 @@
 import axios from 'axios';
 
-const API_BASE_URL = 'http://localhost:8000/api/v1';
+const API_BASE_URL = 'http://127.0.0.1:8000/api/v1';
 
 // Create axios instance
 const api = axios.create({
@@ -71,7 +71,7 @@ export const authAPI = {
 export const productsAPI = {
   getAll: async (skip = 0, limit = 100) => {
     try {
-      const response = await api.get(`/products?skip=${skip}&limit=${limit}`);
+      const response = await api.get(`/products/?skip=${skip}&limit=${limit}`);
       return response.data;
     } catch (error) {
       console.error('Get products API error:', error);
@@ -80,7 +80,7 @@ export const productsAPI = {
   },
   getById: async (id: string) => {
     try {
-      const response = await api.get(`/products/${id}`);
+      const response = await api.get(`/products/product/${id}`);
       return response.data;
     } catch (error) {
       console.error('Get product by ID API error:', error);
@@ -90,7 +90,7 @@ export const productsAPI = {
   create: async (productData: any) => {
     try {
       console.log('Creating product with data:', productData);
-      const response = await api.post('/products', productData);
+      const response = await api.post('/products/product/create', productData);
       console.log('Product created successfully:', response.data);
       return response.data;
     } catch (error) {
@@ -101,20 +101,11 @@ export const productsAPI = {
   update: async (id: string, productData: any) => {
     try {
       console.log('Updating product:', id, productData);
-      const response = await api.put(`/products/${id}`, productData);
+      const response = await api.put(`/products/product/update/${id}`, productData);
       console.log('Product updated successfully:', response.data);
       return response.data;
     } catch (error) {
       console.error('Update product API error:', error);
-      throw error;
-    }
-  },
-  delete: async (id: string) => {
-    try {
-      const response = await api.delete(`/products/${id}`);
-      return response.data;
-    } catch (error) {
-      console.error('Delete product API error:', error);
       throw error;
     }
   },
@@ -124,6 +115,24 @@ export const productsAPI = {
       return response.data;
     } catch (error) {
       console.error('Search products API error:', error);
+      throw error;
+    }
+  },
+  deactivate: async(id:string) => {
+    try {
+      const response = await api.put(`/products/product/deactivate/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Desactivate product API error:', error);
+      throw error;
+    }
+  },
+  activate: async(id:string) => {
+    try {
+      const response = await api.put(`/products/product/activate/${id}`);
+      return response.data;
+    } catch (error) {
+      console.error('Activate product API error:', error);
       throw error;
     }
   },
@@ -142,7 +151,7 @@ export const customersAPI = {
   },
   getById: async (id: string) => {
     try {
-      const response = await api.get(`/customers/${id}`);
+      const response = await api.get(`/customers/customer/${id}`);
       return response.data;
     } catch (error) {
       console.error('Get customer by ID API error:', error);
@@ -151,7 +160,7 @@ export const customersAPI = {
   },
   create: async (customerData: any) => {
     try {
-      const response = await api.post('/customers', customerData);
+      const response = await api.post('/customers/customer/create', customerData);
       return response.data;
     } catch (error) {
       console.error('Create customer API error:', error);
@@ -160,7 +169,7 @@ export const customersAPI = {
   },
   update: async (id: string, customerData: any) => {
     try {
-      const response = await api.put(`/customers/${id}`, customerData);
+      const response = await api.put(`/customers/customer/update/${id}`, customerData);
       return response.data;
     } catch (error) {
       console.error('Update customer API error:', error);
@@ -169,7 +178,7 @@ export const customersAPI = {
   },
   delete: async (id: string) => {
     try {
-      const response = await api.delete(`/customers/${id}`);
+      const response = await api.delete(`/customers/customer/deactivate/${id}`);
       return response.data;
     } catch (error) {
       console.error('Delete customer API error:', error);
@@ -200,7 +209,7 @@ export const suppliersAPI = {
   },
   getById: async (id: string) => {
     try {
-      const response = await api.get(`/suppliers/${id}`);
+      const response = await api.get(`/suppliers/supplier/${id}`);
       return response.data;
     } catch (error) {
       console.error('Get supplier by ID API error:', error);
@@ -209,7 +218,7 @@ export const suppliersAPI = {
   },
   create: async (supplierData: any) => {
     try {
-      const response = await api.post('/suppliers', supplierData);
+      const response = await api.post('/suppliers/supplier/create', supplierData);
       return response.data;
     } catch (error) {
       console.error('Create supplier API error:', error);
@@ -218,7 +227,7 @@ export const suppliersAPI = {
   },
   update: async (id: string, supplierData: any) => {
     try {
-      const response = await api.put(`/suppliers/${id}`, supplierData);
+      const response = await api.put(`/suppliers/supplier/${id}`, supplierData);
       return response.data;
     } catch (error) {
       console.error('Update supplier API error:', error);
@@ -227,7 +236,7 @@ export const suppliersAPI = {
   },
   delete: async (id: string) => {
     try {
-      const response = await api.delete(`/suppliers/${id}`);
+      const response = await api.delete(`/suppliers/deactivate/${id}`);
       return response.data;
     } catch (error) {
       console.error('Delete supplier API error:', error);
@@ -267,7 +276,7 @@ export const salesAPI = {
   },
   create: async (saleData: any) => {
     try {
-      const response = await api.post('/sales', saleData);
+      const response = await api.post('/sales/sale/create', saleData);
       return response.data;
     } catch (error) {
       console.error('Create sale API error:', error);
@@ -276,7 +285,7 @@ export const salesAPI = {
   },
   update: async (id: string, saleData: any) => {
     try {
-      const response = await api.put(`/sales/${id}`, saleData);
+      const response = await api.put(`/sales/sale/update/${id}`, saleData);
       return response.data;
     } catch (error) {
       console.error('Update sale API error:', error);
@@ -285,7 +294,7 @@ export const salesAPI = {
   },
   delete: async (id: string) => {
     try {
-      const response = await api.delete(`/sales/${id}`);
+      const response = await api.delete(`/sales/sale/cancel/${id}`);
       return response.data;
     } catch (error) {
       console.error('Delete sale API error:', error);
